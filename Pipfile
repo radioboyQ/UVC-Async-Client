@@ -11,6 +11,7 @@ pypeln = "*"
 aiohttp = "*"
 pendulum = "*"
 click = "*"
+aiomonitor = "*"
 
 [requires]
 python_version = "3.6"
