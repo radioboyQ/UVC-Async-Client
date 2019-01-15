@@ -91,7 +91,7 @@ def timezone_check(ctx, param, value):
         return value
     elif value is not None:
         for tz in pendulum.timezones:
-            if tz.endswith(value): 
+            if tz.endswith(value):
                 return tz
     else:
         click.echo("Try one of these timezones: \n")
