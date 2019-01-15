@@ -13,9 +13,6 @@ from UVCAsyncLib.UVCAsyncLib import UVC_API_Async
 # Create base logger
 logger = logging.getLogger("UVC-DVR-Downloader")
 
-# Maximum connections that can be open at once
-max_connections_at_once = 25
-
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 async def sub_main(ctx, start_time, end_time, username, hostname, port, output_dir, password, camera_names, timezone, max_connections, dry_run, logger, debug, loop):
@@ -63,11 +60,6 @@ async def sub_main(ctx, start_time, end_time, username, hostname, port, output_d
     raw_resp = await client.logout()
     await client.session.close()
     
-    # Get all the videos
-    # url = "http://localhost:8080/{}"
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(old_main(url, 100000))
-    
 def datetime_check(ctx, param, value):
     """
     Function to check the datetime input
@@ -97,11 +89,18 @@ def timezone_check(ctx, param, value):
     """
     if value in pendulum.timezones:
         return value
+    elif value is not None:
+        for tz in pendulum.timezones:
+            if tz.endswith(value): 
+                return tz
     else:
         click.echo("Try one of these timezones: \n")
         for tz in pendulum.timezones:
             click.echo(tz)
-        raise click.BadParameter(f'The timezone {value} isn\'t valid, try again.')
+        if value is None:
+            raise click.BadParameter('Use one of the above timezones that matches where you are and try again.')
+        else:
+            raise click.BadParameter(f'The timezone {value} isn\'t valid, try again.')
 
 
 @click.command(name='download-videos', context_settings=CONTEXT_SETTINGS)
