@@ -35,10 +35,10 @@ class UVC_API_Async(object):
         
         # Pypeln will take care of rate limiting, not AIOHttp
         connector = TCPConnector(limit=0, ttl_dns_cache=300, verify_ssl=self.ssl_verify)
-        self.session = ClientSession(connector=connector)
+        self.session = ClientSession(connector=connector, trust_env=True, headers= {'User-Agent': 'UVCAsyncLib'})
 
         # Build the session
-        self.session.headers = {'User-Agent': 'UVCAsyncLib'}
+        # self.session.headers = {'User-Agent': 'UVCAsyncLib'}
         if proxy is None:
             # Don't set proxy config
             self.logger.debug('Not using a proxy')
@@ -61,8 +61,9 @@ class UVC_API_Async(object):
             self.logger.debug("Successfully logged into the DVR")
             
             # Request all the user's data
-            user_resp = await self.session.get(f"{self.url}/api/2.0/user")
-            user_data = await user_resp.json()
+            # user_resp = await self.session.get(f"{self.url}/api/2.0/user")
+            # user_data = await user_resp.json()
+            user_data = await r.json()
             self.logger.debug("Obtained all user config data")
             # Get API token for the user
             for d in user_data['data']:
@@ -316,11 +317,10 @@ class UVC_API_Async(object):
 class TaskPool(object):
     
     def __init__(self, workers, loop):
-        self._semaphore = asyncio.Semaphore(workers, loop=loop)
         self._tasks = set()
         self._closed = False
-        self._loop = loop
         self._loop = asyncio.get_event_loop()
+        self._semaphore = asyncio.Semaphore(workers)
     
     async def put(self, coro):
         if self._closed:
