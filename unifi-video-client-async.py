@@ -114,10 +114,12 @@ def timezone_check(ctx, param, value):
 @click.option('-tz', '--timezone', callback=timezone_check, help='Set timezone to be something other than \'America/Denver\'. Default is \'America/Denver\'.', default='America/Denver', type=click.STRING)
 @click.option('-m', '--max-connections', help='Maximum connections to have open at once downloading files. Default is 4.', type=click.IntRange(1, 1000), default=4)
 @click.option('--debug', help="Show debug logs and start AIOMonitor. ", default=False, is_flag=True)
+@click.option('-v', '--verbose', help="Show more information than normal. ", default=False, is_flag=True)
+@click.option('-q', '--quiet', help="Show less information than normal. ", default=False, is_flag=True)
 @click.option('-n','--dry-run', help="Don't download videos, just get a list that *would* be downloaded.", default=False, is_flag=True)
 @click.argument('camera-names', nargs=-1)
 @click.pass_context
-def main(ctx, start_time, end_time, username, hostname, port, output_dir, password, camera_names, timezone, max_connections, dry_run, debug):
+def main(ctx, start_time, end_time, username, hostname, port, output_dir, password, camera_names, timezone, max_connections, dry_run, debug, verbose, quiet):
     """Download videos for cameras for a specific time frame.
 
     Times default to America/Denver."""
@@ -125,8 +127,12 @@ def main(ctx, start_time, end_time, username, hostname, port, output_dir, passwo
     
     if debug:
         console_log_level = logging.DEBUG
+    elif verbose:
+        console_log_level = logging.INFO
+    elif quiet:
+        console_log_level = logging.ERROR
     else:
-        console_log_level = 30
+        console_log_level = logging.WARN
 
     # Base logger
     logger.setLevel(logging.DEBUG)
