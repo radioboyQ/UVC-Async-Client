@@ -58,7 +58,7 @@ class UVC_API_Async(object):
             self.logger.critical(f"Failed to log into the DVR. Check the error {data}")
             sys.exit(1)
         elif r.status is 200:
-            self.logger.debug("Successfully logged into the DVR")
+            self.logger.info("Successfully logged into the DVR")
             
             # Request all the user's data
             # user_resp = await self.session.get(f"{self.url}/api/2.0/user")
@@ -82,7 +82,7 @@ class UVC_API_Async(object):
             sys.exit(1)
 
         elif r.status is 200:
-            self.logger.debug("Successfully logged out the DVR")
+            self.logger.info("Successfully logged out the DVR")
 
             return r
     
@@ -114,7 +114,7 @@ class UVC_API_Async(object):
         else:
             # Check if we got all of the data from bootstrap
             if len(bootstrap_data['data'][0]['cameras']) > 0:
-                self.logger.debug('Obtained camera data from bootstrap endpoint')
+                self.logger.info('Obtained camera data from bootstrap endpoint')
             else:
                 self.logger.critical('The bootstrap endpoint didn\'t provide the correct data. Exiting.')
                 sys.exit(1)
@@ -236,7 +236,7 @@ class UVC_API_Async(object):
         # Prepare the search data
         async with self.session.request('GET', f"{self.url}/api/2.0/recording", params=search_params, headers=search_headers) as r:
             if r.status is 200:
-                clip_id_data = await r.json()
+                self.logger.info("Searching for clips")
             elif r.status is 401:
                 self.logger.critical(f'Unauthorized, exiting.')
                 sys.exit(1)
@@ -244,10 +244,9 @@ class UVC_API_Async(object):
                 self.logger.critical(f'An error occured: {r.status}')
                 sys.exit(1)
 
-        # pprint(clip_id_data, indent=4)
-
         # Get clip meta data
         data = await r.json()
+        self.logger.info("Downloaded the meta data for each clip. ")
         await self.clip_meta_data(data['data'])
 
     async def download_footage(self, loop, max_connections, output_path= Path('downloaded_clips')):
@@ -280,7 +279,7 @@ class UVC_API_Async(object):
             sys.exit(1)
         else:
             self.logger.critical(f'Unexpected error occured: {r.status}. Exiting.')
-            pprint(r.text)
+            self.logger.critical(r.text)
             sys.exit(1)
 
         total = r.headers.get('Content-Length')
