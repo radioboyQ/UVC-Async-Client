@@ -295,7 +295,7 @@ class UVC_API_Async(object):
                 f.write(data)
         self.logger.info(f"Finished downloading file {clip_info.fullFileName}.")
         
-        await r.close()
+        r.close()
 
     def outputPathCheck(self, output_path):
         """
