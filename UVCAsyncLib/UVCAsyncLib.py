@@ -244,8 +244,8 @@ class UVC_API_Async(object):
                 self.logger.critical(f'An error occured: {r.status}')
                 sys.exit(1)
 
-        # Get clip meta data
-        data = await r.json()
+            # Get clip meta data
+            data = await r.json()
         self.logger.info("Downloaded the meta data for each clip. ")
         await self.clip_meta_data(data['data'])
 
